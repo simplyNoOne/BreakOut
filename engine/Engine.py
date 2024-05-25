@@ -1,0 +1,83 @@
+import pygame
+from engine.Scene import Scene
+from engine.ResourceManager import ResourceManager
+from engine.components.TextureComponent import TextureComponent
+from engine.components.CollisionComponent import CollisionComponent
+from engine.enums import CollisionResponse
+
+class Engine:
+
+    _instance = None
+
+    @staticmethod
+    def get():
+        if Engine._instance is None:
+            Engine._instance = Engine()
+        return Engine._instance
+    
+
+    def __init__(self):
+        self._window : pygame.Surface = None
+        self._active_scene : Scene = None
+        self._events : list[pygame.event.Event] = []
+        self._colliders : list[CollisionComponent] = []
+        self._clock = pygame.time.Clock()
+        self._fps = 300
+        self._frame_time = (1 / self._fps)
+
+ 
+    def load(self):
+        pygame.init()
+        self._window = pygame.display.set_mode((1280, 720))
+        self._clock = pygame.time.Clock()
+        ResourceManager.get().load_resources()
+        ResourceManager.get().register_component("TextureComponent", TextureComponent())
+        ResourceManager.get().register_component("CollisionComponent", CollisionComponent())
+        
+
+    def get_events(self) -> list[pygame.event.Event]:
+        return self._events
+
+    def set_active_scene(self, scene : Scene):
+        self._active_scene = scene
+        self._active_scene.load()
+        pygame.display.update()
+        pygame.display.flip()
+
+    def main_loop(self):
+        running = True
+        
+        while running:
+            self._clock.tick(self._fps)
+            self._events.clear()
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                else:
+                    self._events.append(event)
+            
+            self._active_scene.update(self._frame_time)
+            self.check_collisions()
+            self.draw()
+
+    def check_collisions(self):
+        if len(self._colliders) > 1:
+            for i in range(len(self._colliders)):
+                if self._colliders[i].get_response() == CollisionResponse.IGNORE:
+                    continue
+                for j in range(i + 1, len(self._colliders)):
+                    if self._colliders[j].get_response() == CollisionResponse.IGNORE:
+                        continue
+                    if self._colliders[i].collides_with(self._colliders[j]):
+                        self._colliders[i].on_collision(self._colliders[j])
+                    if self._colliders[j].collides_with(self._colliders[i]):
+                        self._colliders[j].on_collision(self._colliders[i])
+                self._colliders[i].update_collisions()
+
+    def unload(self):
+        pygame.quit()
+
+    def draw(self):
+        self._window.fill((0, 0, 0)) 
+        self._active_scene.draw(self._window)
+        pygame.display.flip()
