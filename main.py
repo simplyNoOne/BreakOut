@@ -8,7 +8,7 @@ from game.entities.Wall import Wall
 from game.entities.Brick import Brick
 from game.components.PlayerActionsComponent import PlayerActionsComponent
 from game.components.WallBuilderComponent import WallBuilderComponent
-from game.components.BallBehaviourComponent import BallBehaviourComponent
+from game.components.BallBehaviorComponent import BallBehaviorComponent
 
 Engine.get().load()
 
@@ -25,7 +25,7 @@ ResourceManager.get().register_entity("wall", Wall())
 
 ResourceManager.get().register_component("PlayerActionsComponent", PlayerActionsComponent())
 ResourceManager.get().register_component("WallBuilderComponent", WallBuilderComponent())
-ResourceManager.get().register_component("BallBehaviourComponent", BallBehaviourComponent())
+ResourceManager.get().register_component("BallBehaviorComponent", BallBehaviorComponent())
 
 
                                                    

@@ -15,10 +15,11 @@ class WallBuilderComponent(EntityComponent):
     def construct_wall(self, brick_width, brick_height, rows, cols):
         for i in range(rows):
             for j in range(cols):
-                brick = ResourceManager.get().get_entity("brick")
-                brick.load()
-                brick.get_component("CollisionComponent").set_size(brick_width + 2, brick_height + 2)
-                brick.get_component("CollisionComponent").set_offset(-1, -1)
+                brick = ResourceManager.get().get_loaded_entity("brick")
+                collision_comp = brick.get_component("CollisionComponent")
+                collision_comp.set_size(brick_width + 2, brick_height + 2)
+                collision_comp.set_offset(-1, -1)
+                Engine.get().register_for_collision(collision_comp)
                 brick.get_component("TextureComponent").set_size(brick_width, brick_height)
                 brick.x = self._owner.x + j * (brick_width + 40)
                 brick.y = self._owner.y + i * (brick_height + 40)

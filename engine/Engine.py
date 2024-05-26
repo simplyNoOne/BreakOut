@@ -22,7 +22,7 @@ class Engine:
         self._events : list[pygame.event.Event] = []
         self._colliders : list[CollisionComponent] = []
         self._clock = pygame.time.Clock()
-        self._fps = 300
+        self._fps = 45
         self._width = 1300
         self._height = 700
         self._frame_time = (1 / self._fps)
@@ -36,6 +36,8 @@ class Engine:
         ResourceManager.get().register_component("TextureComponent", TextureComponent())
         ResourceManager.get().register_component("CollisionComponent", CollisionComponent())
         
+    def register_for_collision(self, collider : CollisionComponent):
+        self._colliders.append(collider)
 
     def get_events(self) -> list[pygame.event.Event]:
         return self._events
@@ -66,7 +68,6 @@ class Engine:
             self.draw()
 
     def check_collisions(self):
-        self._colliders = self._active_scene.get_components_for_collision()
         if len(self._colliders) > 1:
             for i in range(len(self._colliders)):
                 if self._colliders[i].get_response() == CollisionResponse.IGNORE:
@@ -98,6 +99,3 @@ class Engine:
 
     def check_intersects(self, rect1 : pygame.Rect, rect2 : pygame.Rect):
         return rect1.colliderect(rect2)
-    
-    def register_collider(self, collider : CollisionComponent):
-        self._colliders.append(collider)

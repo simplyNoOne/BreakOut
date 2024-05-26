@@ -28,13 +28,6 @@ class Entity(ABC):
         for c in self._components:
             c.update(dt)
 
-    def get_components_to_register_for_collision(self):
-        colliders = []
-        for c in self._components:
-            if isinstance(c, CollisionComponent):
-                colliders.append(c)
-        return colliders
-    
     def get_component(self, type: str) -> EntityComponent:
         for c in self._components:
             if c.get_name() == type:

@@ -1,5 +1,6 @@
 
-from engine import Entity, CollisionComponent, TextureComponent, CollisionResponse, CollisionMask
+from engine import Entity, CollisionComponent, TextureComponent, CollisionResponse, CollisionMask, Engine
+from game.components.BallBehaviorComponent import BallBehaviorComponent
 
 
 class Ball(Entity):
@@ -9,6 +10,7 @@ class Ball(Entity):
     def add_components(self):
         self._collision : CollisionComponent = self.create_component_of_type("CollisionComponent")
         self._texture : TextureComponent  = self.create_component_of_type("TextureComponent")
+        self._behavior : BallBehaviorComponent = self.create_component_of_type("BallBehaviorComponent")
 
 
     def load(self):
@@ -19,5 +21,6 @@ class Ball(Entity):
         self._collision.set_collision_type(CollisionMask.MASK2)
         self._collision.add_to_collision_mask(CollisionMask.MASK3)
         self._collision.set_response(CollisionResponse.OVERLAP)
+        Engine.get().register_for_collision(self._collision)
         self.x = 540
-        self.y = 60
+        self.y = 630

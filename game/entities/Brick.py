@@ -1,5 +1,5 @@
 
-from engine import Entity, CollisionComponent, TextureComponent, CollisionResponse, CollisionMask
+from engine import Entity, CollisionComponent, TextureComponent, CollisionResponse, CollisionMask, Engine
 
 
 class Brick(Entity):

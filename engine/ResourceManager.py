@@ -41,7 +41,12 @@ class ResourceManager:
     def register_entity(self, name, entity):
         self._entities[name] = entity
     
-    def get_entity(self, name : str):
+    def get_loaded_entity(self, name : str):
+        to_ret = copy.deepcopy(self._entities[name])
+        to_ret.load()
+        return to_ret
+    
+    def get_entity(self, name):
         return copy.deepcopy(self._entities[name])
     
     def register_scene(self, name, scene):

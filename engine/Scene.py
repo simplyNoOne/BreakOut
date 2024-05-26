@@ -8,19 +8,13 @@ class Scene(ABC):
     @abstractmethod
     def __init__(self):
         self._entities : list[Entity] = []
-        self._registered_colliders : list = []
 
     @abstractmethod
     def load(self):
         self.populate_scene()
         for entity in self._entities:
             entity.load()
-            colliders = entity.get_components_to_register_for_collision()
-            self._registered_colliders.extend(colliders)
         
-    def get_components_for_collision(self):
-        return self._registered_colliders
-
     @abstractmethod
     def populate_scene(self):
         pass
