@@ -1,6 +1,9 @@
+
 from typing import Callable
+from pygame import Rect
+import pygame
 from engine.components.EntityComponent import EntityComponent
-from engine.enums import CollisionResponse
+from engine.enums import CollisionResponse, CollisionMask
 
 class CollisionComponent(EntityComponent):
     def __init__(self):
@@ -11,13 +14,29 @@ class CollisionComponent(EntityComponent):
         self._begin_overlap_calls : list[Callable[['CollisionComponent', 'CollisionComponent'], None]] = []
         self._end_overlap_calls : list[Callable[['CollisionComponent', 'CollisionComponent'], None]] = []
         self._hit_calls : list[Callable[['CollisionComponent', 'CollisionComponent'], None]] = []
-        self._collides_with : list['CollisionComponent'] = None
+        self._collision_mask : list[CollisionMask] = []
+        self._collision_type : CollisionMask = CollisionMask.NONE
+        self._x = 0
+        self._y = 0
+        self._width = 0
+        self._height = 0
 
-    def add_to_collides_with(self, other: 'CollisionComponent') -> None:
-        self._collides_with.append(other)
+    def set_collision_type(self, collision_type: CollisionMask) -> None:
+        self._collision_type = collision_type
 
-    def remove_from_collides_with(self, other: 'CollisionComponent') -> None:
-        self._collides_with.remove(other)
+    def set_offset(self, x: int, y: int) -> None:
+        self._x = x
+        self._y = y
+
+    def set_size(self, width: int, height: int) -> None:
+        self._width = width
+        self._height = height
+
+    def add_to_collision_mask(self, collision_type: CollisionMask) -> None:
+        self._collision_mask.append(collision_type)
+
+    def remove_from_collision_mask(self, collision_type: CollisionMask) -> None:
+        self._collision_mask.remove(collision_type)
 
     def bind_on_begin_ovelap(self, call: Callable[['CollisionComponent', 'CollisionComponent'], None]) -> None:
         self._begin_overlap_calls.append(call)
@@ -37,11 +56,14 @@ class CollisionComponent(EntityComponent):
     def unbind_on_hit(self, call: Callable[['CollisionComponent', 'CollisionComponent'], None]) -> None:
         self._hit_calls.remove(call)
 
+    def set_response(self, response: CollisionResponse) -> None:
+        self._response = response
+
     def get_response(self) -> CollisionResponse:
         return self._response
     
-    def collides_with(self, other: 'CollisionComponent') -> bool:
-        return other in self._collides_with
+    def can_collide_with(self, other: 'CollisionComponent') -> bool:
+        return other._collision_type in self._collision_mask
 
     def on_collision(self, other: 'CollisionComponent') -> None:
         if self._response == CollisionResponse.BLOCK and other.get_response() == CollisionResponse.BLOCK:
@@ -49,11 +71,12 @@ class CollisionComponent(EntityComponent):
         else:
             self._active_overlaps.append(other)
 
+    def get_collision_bounds(self) -> Rect:
+        return Rect(self._x + self._owner.x, self._y + self._owner.y, self._width, self._height)
 
     def hit(self, other: 'CollisionComponent') -> None:
         for call in self._hit_calls:
             call(self, other)
-
 
     def update_collisions(self) -> None:
         for overlap in self._active_overlaps:
@@ -70,3 +93,10 @@ class CollisionComponent(EntityComponent):
         self._cached_overlaps.clear()
         self._cached_overlaps = self._active_overlaps
         self._active_overlaps = []
+
+
+    def draw(self, screen):
+        pygame.draw.rect(screen, (255, 0, 0), self.get_collision_bounds(), 1)
+
+
+

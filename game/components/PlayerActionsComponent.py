@@ -1,4 +1,4 @@
-from engine import EntityComponent
+from engine import EntityComponent, CollisionComponent
 from engine import Engine
 import pygame
 
@@ -51,6 +51,10 @@ class PlayerActionsComponent(EntityComponent):
             self._vel = dt * self._acc + self._vel if abs(self._vel + self._acc * dt) <= self._max_vel else self._max_vel * (self._acc / abs(self._acc))
 
         self._owner.x += self._vel * dt
+
+
+    def on_overlap(self, component: CollisionComponent, other : CollisionComponent):
+        print("MAM CIE")
 
         
 

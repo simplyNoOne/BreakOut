@@ -23,12 +23,14 @@ class Engine:
         self._colliders : list[CollisionComponent] = []
         self._clock = pygame.time.Clock()
         self._fps = 300
+        self._width = 1300
+        self._height = 700
         self._frame_time = (1 / self._fps)
 
  
     def load(self):
         pygame.init()
-        self._window = pygame.display.set_mode((1280, 720))
+        self._window = pygame.display.set_mode((self._width, self._height))
         self._clock = pygame.time.Clock()
         ResourceManager.get().load_resources()
         ResourceManager.get().register_component("TextureComponent", TextureComponent())
@@ -44,6 +46,9 @@ class Engine:
         pygame.display.update()
         pygame.display.flip()
 
+    def get_active_scene(self) -> Scene:
+        return self._active_scene
+    
     def main_loop(self):
         running = True
         
@@ -61,6 +66,7 @@ class Engine:
             self.draw()
 
     def check_collisions(self):
+        self._colliders = self._active_scene.get_components_for_collision()
         if len(self._colliders) > 1:
             for i in range(len(self._colliders)):
                 if self._colliders[i].get_response() == CollisionResponse.IGNORE:
@@ -68,10 +74,15 @@ class Engine:
                 for j in range(i + 1, len(self._colliders)):
                     if self._colliders[j].get_response() == CollisionResponse.IGNORE:
                         continue
-                    if self._colliders[i].collides_with(self._colliders[j]):
-                        self._colliders[i].on_collision(self._colliders[j])
-                    if self._colliders[j].collides_with(self._colliders[i]):
-                        self._colliders[j].on_collision(self._colliders[i])
+                    collision_already_checked = False
+                    if self._colliders[i].can_collide_with(self._colliders[j]):
+                        if self.check_intersects(self._colliders[i].get_collision_bounds(), self._colliders[j].get_collision_bounds()):
+                            collision_already_checked = True
+                            self._colliders[i].on_collision(self._colliders[j])
+                    if self._colliders[j].can_collide_with(self._colliders[i]):
+                        if not collision_already_checked:
+                            if self.check_intersects(self._colliders[i].get_collision_bounds(), self._colliders[j].get_collision_bounds()):
+                                self._colliders[j].on_collision(self._colliders[i])
                 self._colliders[i].update_collisions()
 
     def unload(self):
@@ -81,3 +92,12 @@ class Engine:
         self._window.fill((0, 0, 0)) 
         self._active_scene.draw(self._window)
         pygame.display.flip()
+
+    def get_window_size(self) -> tuple[int, int]:
+        return self._width, self._height
+
+    def check_intersects(self, rect1 : pygame.Rect, rect2 : pygame.Rect):
+        return rect1.colliderect(rect2)
+    
+    def register_collider(self, collider : CollisionComponent):
+        self._colliders.append(collider)

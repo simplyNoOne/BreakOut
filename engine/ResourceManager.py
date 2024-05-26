@@ -2,7 +2,7 @@ import copy
 import os
 import json
 import pygame
-
+from engine.components.EntityComponent import EntityComponent
 
 class ResourceManager:
     _instance = None
@@ -31,7 +31,8 @@ class ResourceManager:
                 self._textures[texture_name] = pygame.image.load(texture_path)
 
 
-    def register_component(self, name, component):
+    def register_component(self, name : str, component : EntityComponent):
+        component.set_name(name)
         self._components[name] = component
 
     def get_component(self, name):
@@ -40,7 +41,7 @@ class ResourceManager:
     def register_entity(self, name, entity):
         self._entities[name] = entity
     
-    def get_entity(self, name):
+    def get_entity(self, name : str):
         return copy.deepcopy(self._entities[name])
     
     def register_scene(self, name, scene):

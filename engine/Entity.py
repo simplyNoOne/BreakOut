@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from engine.components.EntityComponent import EntityComponent
 from engine.ResourceManager import ResourceManager
+from engine.components.CollisionComponent import CollisionComponent
 
 class Entity(ABC):
     @abstractmethod
@@ -27,12 +28,24 @@ class Entity(ABC):
         for c in self._components:
             c.update(dt)
 
+    def get_components_to_register_for_collision(self):
+        colliders = []
+        for c in self._components:
+            if isinstance(c, CollisionComponent):
+                colliders.append(c)
+        return colliders
+    
+    def get_component(self, type: str) -> EntityComponent:
+        for c in self._components:
+            if c.get_name() == type:
+                return c
+        return None
+
     def create_component_of_type(self, type: str) -> EntityComponent:
-        component = ResourceManager.get().get_component(type)
+        component : EntityComponent = ResourceManager.get().get_component(type)
         component._owner = self
         self._components.append(component)
         return component
 
-    @abstractmethod
     def unload(self):
         pass

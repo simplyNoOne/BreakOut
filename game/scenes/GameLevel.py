@@ -8,6 +8,7 @@ class GameLevel(Scene):
     def populate_scene(self):
         self.add_entity("platform")
         self.add_entity("ball")
+        self.add_entity("wall")
 
     def load(self):
         super().load()
