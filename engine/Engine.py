@@ -21,11 +21,14 @@ class Engine:
         self._active_scene : Scene = None
         self._events : list[pygame.event.Event] = []
         self._colliders : list[CollisionComponent] = []
+        self._future_colliders : list[CollisionComponent] = []
         self._clock = pygame.time.Clock()
-        self._fps = 45
+        self._fps = 120
         self._width = 1300
         self._height = 700
+        self._scene_changing = False
         self._frame_time = (1 / self._fps)
+        self._running = False
 
  
     def load(self):
@@ -35,39 +38,48 @@ class Engine:
         ResourceManager.get().load_resources()
         ResourceManager.get().register_component("TextureComponent", TextureComponent())
         ResourceManager.get().register_component("CollisionComponent", CollisionComponent())
+        self._running = True
         
     def register_for_collision(self, collider : CollisionComponent):
-        self._colliders.append(collider)
+        self._future_colliders.append(collider)
+
+    def unregister_for_collision(self, collider : CollisionComponent):
+        self._future_colliders.remove(collider)
 
     def get_events(self) -> list[pygame.event.Event]:
         return self._events
 
-    def set_active_scene(self, scene : Scene):
+    def set_active_scene(self, scene_name : str):
+        scene = ResourceManager.get().get_scene(scene_name)
+        if self._active_scene is not None:
+            self._scene_changing = True
+            self._active_scene.unload()
         self._active_scene = scene
         self._active_scene.load()
-        pygame.display.update()
-        pygame.display.flip()
+        self.draw()
+        pygame.time.delay(200)
+        self._scene_changing = False
 
     def get_active_scene(self) -> Scene:
         return self._active_scene
     
-    def main_loop(self):
-        running = True
-        
-        while running:
+    def main_loop(self):        
+        while self._running:
             self._clock.tick(self._fps)
             self._events.clear()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    running = False
+                    self._running = False
                 else:
                     self._events.append(event)
-            
-            self._active_scene.update(self._frame_time)
-            self.check_collisions()
-            self.draw()
+            if not self._scene_changing:
+                self._active_scene.update(self._frame_time)
+                self.check_collisions()
+                self.draw()
+
 
     def check_collisions(self):
+        self._colliders = self._future_colliders.copy()
         if len(self._colliders) > 1:
             for i in range(len(self._colliders)):
                 if self._colliders[i].get_response() == CollisionResponse.IGNORE:
@@ -76,17 +88,24 @@ class Engine:
                     if self._colliders[j].get_response() == CollisionResponse.IGNORE:
                         continue
                     collision_already_checked = False
+                    intersects = False
                     if self._colliders[i].can_collide_with(self._colliders[j]):
-                        if self.check_intersects(self._colliders[i].get_collision_bounds(), self._colliders[j].get_collision_bounds()):
-                            collision_already_checked = True
+                        collision_already_checked = True
+                        intersects= self.check_intersects(self._colliders[i].get_collision_bounds(), self._colliders[j].get_collision_bounds())
+                        if intersects:
                             self._colliders[i].on_collision(self._colliders[j])
                     if self._colliders[j].can_collide_with(self._colliders[i]):
                         if not collision_already_checked:
-                            if self.check_intersects(self._colliders[i].get_collision_bounds(), self._colliders[j].get_collision_bounds()):
-                                self._colliders[j].on_collision(self._colliders[i])
+                            intersects = self.check_intersects(self._colliders[i].get_collision_bounds(), self._colliders[j].get_collision_bounds())
+                        if intersects:
+                            self._colliders[j].on_collision(self._colliders[i])
                 self._colliders[i].update_collisions()
 
+    def quit_game(self):
+        self._running = False
+
     def unload(self):
+        self._active_scene.unload()
         pygame.quit()
 
     def draw(self):

@@ -90,13 +90,15 @@ class CollisionComponent(EntityComponent):
             for call in self._end_overlap_calls:
                 call(self, overlap)
 
-        self._cached_overlaps.clear()
+        # self._cached_overlaps.clear()
         self._cached_overlaps = self._active_overlaps
         self._active_overlaps = []
 
 
     def draw(self, screen):
         pygame.draw.rect(screen, (255, 0, 0), self.get_collision_bounds(), 1)
+
+
 
 
 

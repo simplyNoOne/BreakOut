@@ -39,6 +39,7 @@ class ResourceManager:
         return copy.deepcopy(self._components[name])
     
     def register_entity(self, name, entity):
+        entity.set_name(name)
         self._entities[name] = entity
     
     def get_loaded_entity(self, name : str):

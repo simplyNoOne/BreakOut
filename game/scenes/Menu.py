@@ -5,16 +5,9 @@ class Menu(Scene):
         super().__init__()
 
 
-
-    def draw(self, window):
-        pass
-
-    def update(self, dt):
-        pass
-
     
     def populate_scene(self):
-        self.add_entity("platform")
+        self.add_entity("menu_entity")
 
     def load(self):
         super().load()

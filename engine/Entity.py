@@ -9,12 +9,24 @@ class Entity(ABC):
         self._components : list[EntityComponent] = []
         self.x = 0
         self.y = 0
+        self._loaded = False
+        self._name = "Entity"
+
+    def get_name(self) -> str:
+        return self._name
+    
+    def set_name(self, name):
+        self._name = name
 
     @abstractmethod
     def load(self):
+        self._loaded = True
         self.add_components()
         for c in self._components:
             c.load()
+
+    def not_loaded(self) -> bool:
+        return not self._loaded
         
     @abstractmethod
     def add_components(self):
@@ -40,5 +52,6 @@ class Entity(ABC):
         self._components.append(component)
         return component
 
+    @abstractmethod
     def unload(self):
         pass

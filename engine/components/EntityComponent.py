@@ -9,6 +9,9 @@ class EntityComponent(ABC):
         self._owner = None
         self._name = "EntityComponent"
 
+    def get_owner(self):
+        return self._owner
+
     def update(self, dt):
         pass
 

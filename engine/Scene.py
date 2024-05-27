@@ -13,8 +13,13 @@ class Scene(ABC):
     def load(self):
         self.populate_scene()
         for entity in self._entities:
-            entity.load()
+            if entity.not_loaded():
+                entity.load()
         
+    def unload(self):
+        for entity in self._entities:
+            entity.unload()
+    
     @abstractmethod
     def populate_scene(self):
         pass
@@ -36,4 +41,8 @@ class Scene(ABC):
         self._entities.append(entity)
 
     def remove_entity(self, entity: Entity):
-        self._entities.remove(entity)
+        entity.unload()
+        try:
+            self._entities.remove(entity)
+        except ValueError:
+            pass
