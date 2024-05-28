@@ -4,7 +4,6 @@ class Menu(Scene):
     def __init__(self):
         super().__init__()
 
-
     
     def populate_scene(self):
         self.add_entity("menu_entity")

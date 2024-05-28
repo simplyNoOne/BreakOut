@@ -1,6 +1,8 @@
 import pygame
 from engine import Engine, EntityComponent, ResourceManager
 from game.entities.MenuButton import MenuButton
+from game.GameManager import GameManager
+
 
 class MenuButtonsComponent(EntityComponent):
     def __init__(self):
@@ -9,6 +11,7 @@ class MenuButtonsComponent(EntityComponent):
         self._quit : MenuButton = None
         self._buttons : list[MenuButton] = []
         self._active_button = 0
+        self._on_play : list[function]= []
         
 
     def load(self):
@@ -21,6 +24,10 @@ class MenuButtonsComponent(EntityComponent):
         Engine.get().get_active_scene().add_existing_entity(self._play)
         Engine.get().get_active_scene().add_existing_entity(self._quit)
         
+
+    def bind_to_on_play(self, func):
+        self._on_play.append(func)
+
     def setup_buttons(self):
         self._play.x = self._owner.x - 300 - self._play.get_component("TextureComponent").get_size()[0]
         self._play.y = self._owner.y
@@ -42,7 +49,8 @@ class MenuButtonsComponent(EntityComponent):
                     self._active_button = self._active_button + 1 if self._active_button < len(self._buttons) - 1 else len(self._buttons) - 1
                 if event.key == pygame.K_RETURN:
                     if self._buttons[self._active_button] == self._play:
-                        Engine.get().set_active_scene("game_level")
+                        for func in self._on_play:
+                            func()
                     if self._buttons[self._active_button] == self._quit:
                         Engine.get().quit_game()
         

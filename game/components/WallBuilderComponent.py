@@ -1,5 +1,6 @@
 from engine import EntityComponent, CollisionComponent
 from engine import Engine, ResourceManager
+from game.GameManager import GameManager
 import pygame
 
 class WallBuilderComponent(EntityComponent):
@@ -12,7 +13,7 @@ class WallBuilderComponent(EntityComponent):
         self._owner.x = 10
         self._owner.y = 10
         x, y = Engine.get().get_window_size()
-        cols, rows = 10, 6
+        cols, rows = GameManager.get().get_cols(), GameManager.get().get_rows()
         space = 10
         width = (x - space) // cols - space
         height = 20

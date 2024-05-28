@@ -1,5 +1,6 @@
 from engine import EntityComponent, CollisionComponent
 from engine import Engine
+from game.GameManager import GameManager
 import pygame
 
 class PlayerActionsComponent(EntityComponent):
@@ -8,10 +9,14 @@ class PlayerActionsComponent(EntityComponent):
         self._acc = 0
         self._acc_value = 800
         self._vel = 0
-        self._max_vel = 900
+        self._max_vel = 0
         self._move_l = False
         self._move_r = False
         self._is_moving = False
+
+    def load(self):
+        super().load()
+        self._max_vel = GameManager.get().get_platform_vel()
 
     def update(self, dt):
         super().update(dt)
