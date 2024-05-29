@@ -56,6 +56,10 @@ class PlayerActionsComponent(EntityComponent):
             self._vel = dt * self._acc + self._vel if abs(self._vel + self._acc * dt) <= self._max_vel else self._max_vel * (self._acc / abs(self._acc))
 
         self._owner.x += self._vel * dt
+        if self._owner.x < 0:
+            self._owner.x = 0
+        if self._owner.x > Engine.get().get_window_size()[0] - self._owner.get_component("TextureComponent").get_size()[0]:
+            self._owner.x = Engine.get().get_window_size()[0] - self._owner.get_component("TextureComponent").get_size()[0]
 
 
     def on_overlap(self, component: CollisionComponent, other : CollisionComponent):

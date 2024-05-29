@@ -24,13 +24,13 @@ class DatabaseManager:
             return 0
         return score[0].score
    
-    def set_player_score(self, player: Player, score: int):
+    def set_player_score(self, player: Player, score_val: int):
         try:
             score = Score.get(Score.player == player)
-            score.score = score
+            score.score = score_val
             score.save()
         except Score.DoesNotExist:
-            Score.create(player=player, score=score)
+            Score.create(player=player, score=score_val)
 
     def get_num_players(self):
         return Player.select().count()
@@ -42,6 +42,8 @@ class DatabaseManager:
             worst.delete_instance()
             num -= 1
         
-
+    def get_scores(self):
+        return Score.select().order_by(Score.score.desc())
+        
     def get_worst_score(self):
         return Score.select().order_by(Score.score.asc()).limit(1)

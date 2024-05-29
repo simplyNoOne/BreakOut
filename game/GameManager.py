@@ -29,6 +29,21 @@ class GameManager:
         self._scene : str = "menu"
         self._loaded = False
 
+    def log_player(self, player_name, password):
+        if player_name == "":
+            player_name = "Anonymous"
+            password = ""
+        self._player = Player.get_or_none(Player.name == player_name)
+        if not self._player:
+            self._player = Player.create(name=player_name, password=password)
+            self._db.set_player_score(self._player, 0)
+        else:
+            if self._player.password != password:
+                self._player = None
+                return
+        self.start_game()
+            
+
 
     def load(self):
         if self._loaded:
@@ -53,6 +68,14 @@ class GameManager:
         self.reset_game()
         Engine.get().set_active_scene(self._scene)
 
+    def to_leaderboard(self):
+        self._scene = "leaderboard"
+        Engine.get().set_active_scene(self._scene)
+
+    def back_to_menu(self):
+        self._scene = "menu"
+        Engine.get().set_active_scene(self._scene)
+
     def update_db(self):
         former_best = self._db.get_player_score(self._player)
         if former_best > self._score:
@@ -60,16 +83,11 @@ class GameManager:
         self._db.set_player_score(self._player, self._score)
         self._db.remove_excess(10)
 
-    def set_player(self, player_name : str):
-        self._player = Player.get_or_create(name=player_name)[0]
-        print("Player is being made" + player_name)
-
     def get_cols(self):
         return self._start_cols + (self._round // 3)
     
     def get_rows(self):
         return self._start_rows
-
     
     def get_ball_vel(self):
         return self._start_ball_vel + (self._round * self._ball_vel_incr)
@@ -89,3 +107,5 @@ class GameManager:
         if self._bricks_left == 0:
             self.on_won()
 
+    def get_leaderboard(self):
+        return self._db.get_scores()
