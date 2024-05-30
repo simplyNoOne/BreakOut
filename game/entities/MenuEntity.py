@@ -17,7 +17,7 @@ class MenuEntity(Entity):
     def load(self):
         window_size = Engine.get().get_window_size()
         self.x = window_size[0] // 2
-        self.y = 3 * window_size[1] // 4
+        self.y = window_size[1] // 2
         super().load()
         self._buttons_actions.bind_to_on_play(self._player_name_actions.try_start_game)
         self._buttons_actions.bind_to_give_up_focus(self._player_name_actions.get_focus)

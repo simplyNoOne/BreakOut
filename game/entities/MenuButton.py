@@ -11,7 +11,7 @@ class MenuButton(Entity):
 
     def load(self):
         super().load()
-        self._texture.set_texture("red", 200, 50)
+        self._texture.set_texture("red", 240, 60)
        
 
     def unload(self):

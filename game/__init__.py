@@ -7,6 +7,9 @@ from .entities.Wall import Wall
 from .entities.Brick import Brick
 from .entities.MenuButton import MenuButton
 from .entities.MenuEntity import MenuEntity
+from .entities.StatsDisplay import StatsDisplay
+from .entities.Title import Title
+from .components.StatsDisplayComponent import StatsDisplayComponent
 from .entities.LeaderboardEntity import LeaderboardEntity
 from .components.LeaderboardComponent import LeaderboardComponent
 from .components.PlayerActionsComponent import PlayerActionsComponent

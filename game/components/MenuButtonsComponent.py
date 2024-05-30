@@ -17,6 +17,9 @@ class MenuButtonsComponent(EntityComponent):
         self._on_quit : list[function]= []
         self._on_give_up_focus : list[function] = []
         self._focused : bool = False
+        self._text_color = (220, 220, 220)
+        self._font_size = 45
+        self._button_shift = 300
         
 
     def load(self):
@@ -24,9 +27,10 @@ class MenuButtonsComponent(EntityComponent):
         self._play = ResourceManager.get().get_loaded_entity("menu_button")
         self._leaderboard = ResourceManager.get().get_loaded_entity("menu_button")
         self._quit = ResourceManager.get().get_loaded_entity("menu_button")
-        self._buttons.append(self._play)
         self._buttons.append(self._leaderboard)
+        self._buttons.append(self._play)
         self._buttons.append(self._quit)
+        self._buttons_y = self._owner.y + 150
         self.setup_buttons()
         Engine.get().get_active_scene().add_existing_entity(self._play)
         Engine.get().get_active_scene().add_existing_entity(self._leaderboard)
@@ -46,12 +50,19 @@ class MenuButtonsComponent(EntityComponent):
         self._on_give_up_focus.append(func)
 
     def setup_buttons(self):
-        self._play.x = self._owner.x - 400 - self._play.get_component("TextureComponent").get_size()[0]
-        self._play.y = self._owner.y
-        self._leaderboard.x = self._owner.x - self._play.get_component("TextureComponent").get_size()[0] // 2
-        self._leaderboard.y = self._owner.y
-        self._quit.x = self._owner.x + 400
-        self._quit.y = self._owner.y
+        leader_txt = self._leaderboard.get_component("TextureComponent")
+        leader_txt.add_text("Scores", self._font_size, self._text_color)
+        self._leaderboard.x = self._owner.x - self._button_shift - leader_txt.get_size()[0]
+        self._leaderboard.y = self._buttons_y
+        play_txt = self._play.get_component("TextureComponent")
+        play_txt.set_size(play_txt.get_size()[0] * 7 // 5, play_txt.get_size()[1] * 7 // 5)
+        play_txt.add_text("Play", self._font_size + 10, self._text_color)
+        self._play.x = self._owner.x - play_txt.get_size()[0] // 2
+        self._play.y = self._buttons_y - 10
+        quit_txt = self._quit.get_component("TextureComponent")
+        quit_txt.add_text("Quit", self._font_size, self._text_color)
+        self._quit.x = self._owner.x + self._button_shift
+        self._quit.y = self._buttons_y
 
     def update(self, dt):
         super().update(dt)
@@ -90,5 +101,5 @@ class MenuButtonsComponent(EntityComponent):
             self._buttons[self._active_button].get_component("TextureComponent").switch_texture("green")
 
     def get_focus(self):
-        self._active_button = 0
+        self._active_button = 1
         self._focused = True

@@ -10,13 +10,17 @@ class LeaderboardComponent(EntityComponent):
         self._leaderboard = []
         self._back_button : MenuButton = None
         self._on_back = []
+        self._font_size = 45
+        self._color = (220, 220, 220)
 
     def load(self):
         super().load()
         self._back_button = ResourceManager.get().get_loaded_entity("menu_button")
-        self._back_button.x = self._owner.x - 100
+        txt_comp = self._back_button.get_component("TextureComponent")
+        txt_comp.switch_texture("green")
+        txt_comp.add_text("Back", self._font_size, self._color)
+        self._back_button.x = self._owner.x - txt_comp.get_size()[0] // 2
         self._back_button.y = (5 * self._owner.y ) // 3
-        self._back_button.get_component("TextureComponent").switch_texture("green")
         Engine.get().get_active_scene().add_existing_entity(self._back_button)
         self._font = pygame.font.Font(None, 50)
         self.populate_leaderboard()

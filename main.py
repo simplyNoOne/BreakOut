@@ -3,7 +3,8 @@ from engine import Engine, ResourceManager
 from game import GameLevel, Menu, Leaderboard
 from game import Platform, Ball, Wall, Brick
 from game import LeaderboardEntity, LeaderboardComponent
-from game import MenuButton, MenuEntity, MenuButtonsComponent, TextInputComponent
+from game import StatsDisplayComponent, StatsDisplay
+from game import MenuButton, MenuEntity, MenuButtonsComponent, TextInputComponent, Title
 from game import PlayerActionsComponent, WallBuilderComponent, BallBehaviorComponent, BrickBehaviorComponent
 from game import GameManager
 
@@ -25,6 +26,9 @@ ResourceManager.get().register_entity("wall", Wall())
 ResourceManager.get().register_entity("menu_button", MenuButton())
 ResourceManager.get().register_entity("menu_entity", MenuEntity())
 ResourceManager.get().register_entity("leaderboard_entity", LeaderboardEntity())
+ResourceManager.get().register_entity("stats_display", StatsDisplay())
+ResourceManager.get().register_entity("title", Title())
+
 
 
 
@@ -35,6 +39,8 @@ ResourceManager.get().register_component("BrickBehaviorComponent", BrickBehavior
 ResourceManager.get().register_component("MenuButtonsComponent", MenuButtonsComponent())
 ResourceManager.get().register_component("PlayerNameComponent", TextInputComponent())
 ResourceManager.get().register_component("LeaderboardComponent", LeaderboardComponent())
+ResourceManager.get().register_component("StatsDisplayComponent", StatsDisplayComponent())
+
 
 
 GameManager.get().load()

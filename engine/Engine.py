@@ -3,7 +3,7 @@ from engine.Scene import Scene
 from engine.ResourceManager import ResourceManager
 from engine.components.TextureComponent import TextureComponent
 from engine.components.CollisionComponent import CollisionComponent
-from engine.enums import CollisionResponse
+from engine.enums import CollisionResponse, Mobility
 
 class Engine:
 
@@ -20,10 +20,12 @@ class Engine:
         self._window : pygame.Surface = None
         self._active_scene : Scene = None
         self._events : list[pygame.event.Event] = []
-        self._colliders : list[CollisionComponent] = []
-        self._future_colliders : list[CollisionComponent] = []
+        self._static_colliders : list[CollisionComponent] = []
+        self._dynamic_colliders : list[CollisionComponent] = []
+        self._static_future_colliders : list[CollisionComponent] = []
+        self._dynamic_future_colliders : list[CollisionComponent] = []
         self._clock = pygame.time.Clock()
-        self._fps = 120
+        self._fps = 180
         self._width = 1300
         self._height = 700
         self._scene_changing = False
@@ -41,10 +43,19 @@ class Engine:
         self._running = True
         
     def register_for_collision(self, collider : CollisionComponent):
-        self._future_colliders.append(collider)
+        if collider.get_mobility() == Mobility.DYNAMIC:
+            self._dynamic_future_colliders.append(collider)
+        else:
+            self._static_future_colliders.append(collider)
 
     def unregister_for_collision(self, collider : CollisionComponent):
-        self._future_colliders.remove(collider)
+        try:
+            if collider.get_mobility() == Mobility.DYNAMIC:
+                self._dynamic_future_colliders.remove(collider)
+            else:
+                self._static_future_colliders.remove(collider)
+        except ValueError:
+            print("A FUCKUP")
 
     def get_events(self) -> list[pygame.event.Event]:
         return self._events
@@ -79,27 +90,38 @@ class Engine:
 
 
     def check_collisions(self):
-        self._colliders = self._future_colliders.copy()
-        if len(self._colliders) > 1:
-            for i in range(len(self._colliders)):
-                if self._colliders[i].get_response() == CollisionResponse.IGNORE:
+        self._static_colliders = self._static_future_colliders.copy()
+        self._dynamic_colliders = self._dynamic_future_colliders.copy()
+        if len(self._dynamic_colliders) > 0:
+            for i in range(len(self._dynamic_colliders)):
+                if self._dynamic_colliders[i].get_response() == CollisionResponse.IGNORE:
                     continue
-                for j in range(i + 1, len(self._colliders)):
-                    if self._colliders[j].get_response() == CollisionResponse.IGNORE:
-                        continue
-                    collision_already_checked = False
-                    intersects = False
-                    if self._colliders[i].can_collide_with(self._colliders[j]):
-                        collision_already_checked = True
-                        intersects= self.check_intersects(self._colliders[i].get_collision_bounds(), self._colliders[j].get_collision_bounds())
-                        if intersects:
-                            self._colliders[i].on_collision(self._colliders[j])
-                    if self._colliders[j].can_collide_with(self._colliders[i]):
-                        if not collision_already_checked:
-                            intersects = self.check_intersects(self._colliders[i].get_collision_bounds(), self._colliders[j].get_collision_bounds())
-                        if intersects:
-                            self._colliders[j].on_collision(self._colliders[i])
-                self._colliders[i].update_collisions()
+                for j in range(i + 1, len(self._dynamic_colliders)):
+                    self.collide_two(self._dynamic_colliders[i], self._dynamic_colliders[j])
+                for j in range(len(self._static_colliders)):
+                    self.collide_two(self._dynamic_colliders[i], self._static_colliders[j])
+                self._dynamic_colliders[i].update_collisions()
+            for i in range(len(self._static_colliders)):
+                self._static_colliders[i].update_collisions()
+
+
+    def collide_two(self, collider : CollisionComponent, other : CollisionComponent):
+        if other.get_response() == CollisionResponse.IGNORE:
+            return
+        collision_already_checked = False
+        intersects = False
+        if collider.can_collide_with(other):
+            collision_already_checked = True
+            intersects= self.check_intersects(collider.get_collision_bounds(), other.get_collision_bounds())
+            if intersects:
+                collider.on_collision(other)
+        if other.can_collide_with(collider):
+            if not collision_already_checked:
+                intersects = self.check_intersects(collider.get_collision_bounds(), other.get_collision_bounds())
+            if intersects:
+                other.on_collision(collider)
+
+
 
     def quit_game(self):
         self._running = False

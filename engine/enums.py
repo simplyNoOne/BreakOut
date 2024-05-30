@@ -4,7 +4,10 @@ from enum import Enum
 class CollisionResponse(Enum):
     IGNORE = 0
     OVERLAP = 1
-    BLOCK = 2
+
+class Mobility(Enum):
+    STATIC = 0
+    DYNAMIC = 1
 
 
 class CollisionMask(Enum):

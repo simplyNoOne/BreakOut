@@ -9,11 +9,12 @@ class TextInputComponent(EntityComponent):
         self._player_name : list[str] = [""]
         self._pass : list[str] = [""]
         self._text : list[str] = self._player_name
-        self._box_w = 200
+        self._box_w = 300
         self._box_h = 60
         self._box_x = 0
         self._box_y1 = 0
         self._box_y2 = 0
+        self._label_color = (220, 220, 220)
         self._active_color = (200, 200, 200)
         self._inactive_color = (100, 100, 100)
         self._col_1 = self._active_color
@@ -23,15 +24,21 @@ class TextInputComponent(EntityComponent):
         self._just_returned = False
         self._on_give_up_focus = []
         self._on_credentials_collected = []
-
+        self._shift = 15
+        self._up_shift = 100
         
+
 
     def load(self):
         super().load()
-        self._box_x = self._owner.x - 100
-        self._box_y1 = self._owner.y - 400
-        self._box_y2 = self._owner.y - 400 + self._box_h + 20
         self._font = pygame.font.Font(None, 50)
+        self._label_x = self._owner.x - 300
+        self._label_name_surface = self._font.render("Name: ", True, self._label_color)
+        self._label_pass_surface = self._font.render("Password: ", True, self._label_color)
+        w = self._label_pass_surface.get_width()
+        self._box_x = self._label_x + w + 20
+        self._box_y1 = self._owner.y - self._up_shift
+        self._box_y2 = self._owner.y - self._up_shift + self._box_h + 20
 
 
     def update(self, dt):
@@ -53,7 +60,8 @@ class TextInputComponent(EntityComponent):
                 elif event.key == pygame.K_DOWN:
                     self.focus_down()
                 elif event.unicode.isalnum() or event.unicode == "":
-                    self._text[0] += event.unicode
+                    if len(self._text[0]) < 10:
+                        self._text[0] += event.unicode
                 
 
     def try_start_game(self):
@@ -63,10 +71,12 @@ class TextInputComponent(EntityComponent):
 
     def draw(self, window):
         super().draw(window)
+        window.blit(self._label_name_surface, (self._label_x, self._box_y1 + self._shift))
+        window.blit(self._label_pass_surface, (self._label_x, self._box_y2 + self._shift))
         name_surface = self._font.render(self._player_name[0], True, (250,250,250))
-        window.blit(name_surface, (self._box_x + 5, self._box_y1 + 5))
+        window.blit(name_surface, (self._box_x + self._shift, self._box_y1 + self._shift))
         pass_surface = self._font.render(self._pass[0], True, (250,250,250))
-        window.blit(pass_surface, (self._box_x + 5, self._box_y2 + 5))
+        window.blit(pass_surface, (self._box_x + self._shift, self._box_y2 + self._shift))
         pygame.draw.rect(window, self._col_1, (self._box_x, self._box_y1, self._box_w, self._box_h), 2)
         pygame.draw.rect(window, self._col_2, (self._box_x, self._box_y2, self._box_w, self._box_h), 2)
 

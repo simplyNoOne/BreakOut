@@ -7,6 +7,7 @@ class Menu(Scene):
     
     def populate_scene(self):
         self.add_entity("menu_entity")
+        self.add_entity("title")
 
     def load(self):
         super().load()

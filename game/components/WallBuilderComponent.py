@@ -11,7 +11,7 @@ class WallBuilderComponent(EntityComponent):
     def load(self):
         super().load()
         self._owner.x = 10
-        self._owner.y = 10
+        self._owner.y = 50
         x, y = Engine.get().get_window_size()
         cols, rows = GameManager.get().get_cols(), GameManager.get().get_rows()
         space = 10
@@ -25,8 +25,8 @@ class WallBuilderComponent(EntityComponent):
             for j in range(cols):
                 brick = ResourceManager.get().get_loaded_entity("brick")
                 collision_comp = brick.get_component("CollisionComponent")
-                collision_comp.set_size(brick_width + 2, brick_height + 2)
-                collision_comp.set_offset(-1, -1)
+                collision_comp.set_size(brick_width, brick_height )
+                collision_comp.set_offset(0, 0)
                 Engine.get().register_for_collision(collision_comp)
                 brick.get_component("TextureComponent").set_size(brick_width, brick_height)
                 brick.x = self._owner.x + j * (brick_width + space)

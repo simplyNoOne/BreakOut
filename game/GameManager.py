@@ -18,12 +18,12 @@ class GameManager:
         self._round : int= 0
         self._score : int = 0
         self._player : Player = None
-        self._start_platform_vel = 800
-        self._start_ball_vel = 350
+        self._start_platform_vel = 900
+        self._start_ball_vel = 200
         self._ball_vel_incr = 50
         self._platform_vel_incr = 50
-        self._start_cols = 8
-        self._start_rows = 5
+        self._start_cols = 7
+        self._start_rows = 4
         self._bricks = self._start_rows * self._start_cols
         self._bricks_left = self._bricks
         self._scene : str = "menu"
@@ -42,7 +42,10 @@ class GameManager:
                 self._player = None
                 return
         self.start_game()
-            
+
+    def refresh_bricks(self):
+        self._bricks = self.get_cols() * self.get_rows()
+        self._bricks_left = self._bricks            
 
 
     def load(self):
@@ -54,12 +57,14 @@ class GameManager:
 
     def start_game(self):
         self._round = 1
+        self.refresh_bricks()
         self._scene = "game_level"
         Engine.get().set_active_scene(self._scene)
 
     def reset_game(self):
         self._score = 0
         self._round = 0
+        self.refresh_bricks()
         self._player = None
 
     def on_lost(self):
@@ -83,6 +88,9 @@ class GameManager:
         self._db.set_player_score(self._player, self._score)
         self._db.remove_excess(10)
 
+    def get_round(self):
+        return self._round
+
     def get_cols(self):
         return self._start_cols + (self._round // 3)
     
@@ -95,8 +103,12 @@ class GameManager:
     def get_platform_vel(self):
         return self._start_platform_vel + ((self._round // 2) * self._platform_vel_incr)
 
+    def get_score(self):
+        return self._score
+
     def on_won(self):
         self._round += 1
+        self.refresh_bricks()
         self._scene = "game_level"
         Engine.get().set_active_scene(self._scene)
 
@@ -109,3 +121,6 @@ class GameManager:
 
     def get_leaderboard(self):
         return self._db.get_scores()
+    
+    def get_players_best(self):
+        return self._db.get_player_score(self._player)

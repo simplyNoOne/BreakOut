@@ -7,7 +7,7 @@ class PlayerActionsComponent(EntityComponent):
     def __init__(self):
         super().__init__()
         self._acc = 0
-        self._acc_value = 800
+        self._acc_value = 1000
         self._vel = 0
         self._max_vel = 0
         self._move_l = False
@@ -17,6 +17,7 @@ class PlayerActionsComponent(EntityComponent):
     def load(self):
         super().load()
         self._max_vel = GameManager.get().get_platform_vel()
+        self._window_width = Engine.get().get_window_size()[0]
 
     def update(self, dt):
         super().update(dt)
@@ -58,14 +59,8 @@ class PlayerActionsComponent(EntityComponent):
         self._owner.x += self._vel * dt
         if self._owner.x < 0:
             self._owner.x = 0
-        if self._owner.x > Engine.get().get_window_size()[0] - self._owner.get_component("TextureComponent").get_size()[0]:
-            self._owner.x = Engine.get().get_window_size()[0] - self._owner.get_component("TextureComponent").get_size()[0]
+        if self._owner.x > self._window_width - self._owner.get_component("TextureComponent").get_size()[0]:
+            self._owner.x = self._window_width - self._owner.get_component("TextureComponent").get_size()[0]
 
 
-    def on_overlap(self, component: CollisionComponent, other : CollisionComponent):
-        print("MAM CIE")
-
-        
-
-    
         

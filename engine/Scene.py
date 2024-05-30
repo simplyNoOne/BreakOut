@@ -41,8 +41,6 @@ class Scene(ABC):
         self._entities.append(entity)
 
     def remove_entity(self, entity: Entity):
+        self._entities.remove(entity)
         entity.unload()
-        try:
-            self._entities.remove(entity)
-        except ValueError:
-            pass
+        

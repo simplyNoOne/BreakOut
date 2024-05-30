@@ -3,7 +3,7 @@ from typing import Callable
 from pygame import Rect
 import pygame
 from engine.components.EntityComponent import EntityComponent
-from engine.enums import CollisionResponse, CollisionMask
+from engine.enums import CollisionResponse, CollisionMask, Mobility
 
 class CollisionComponent(EntityComponent):
     def __init__(self):
@@ -16,6 +16,7 @@ class CollisionComponent(EntityComponent):
         self._hit_calls : list[Callable[['CollisionComponent', 'CollisionComponent'], None]] = []
         self._collision_mask : list[CollisionMask] = []
         self._collision_type : CollisionMask = CollisionMask.NONE
+        self._mobility : Mobility = Mobility.STATIC
         self._x = 0
         self._y = 0
         self._width = 0
@@ -62,14 +63,17 @@ class CollisionComponent(EntityComponent):
     def get_response(self) -> CollisionResponse:
         return self._response
     
+    def get_mobility(self) -> Mobility:
+        return self._mobility
+    
+    def set_mobility(self, mobility: Mobility) -> None:
+        self._mobility = mobility
+    
     def can_collide_with(self, other: 'CollisionComponent') -> bool:
         return other._collision_type in self._collision_mask
 
     def on_collision(self, other: 'CollisionComponent') -> None:
-        if self._response == CollisionResponse.BLOCK and other.get_response() == CollisionResponse.BLOCK:
-            self.hit(other)
-        else:
-            self._active_overlaps.append(other)
+        self._active_overlaps.append(other)
 
     def get_collision_bounds(self) -> Rect:
         return Rect(self._x + self._owner.x, self._y + self._owner.y, self._width, self._height)
@@ -77,6 +81,12 @@ class CollisionComponent(EntityComponent):
     def hit(self, other: 'CollisionComponent') -> None:
         for call in self._hit_calls:
             call(self, other)
+
+    def get_width(self) -> int:
+        return self._width
+    
+    def get_height(self) -> int:
+        return self._height
 
     def update_collisions(self) -> None:
         for overlap in self._active_overlaps:
@@ -95,8 +105,8 @@ class CollisionComponent(EntityComponent):
         self._active_overlaps = []
 
 
-    def draw(self, screen):
-        pygame.draw.rect(screen, (255, 0, 0), self.get_collision_bounds(), 1)
+    # def draw(self, screen):
+    #     pygame.draw.rect(screen, (255, 0, 0), self.get_collision_bounds(), 1)
 
 
 
