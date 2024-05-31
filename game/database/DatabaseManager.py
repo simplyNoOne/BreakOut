@@ -39,6 +39,7 @@ class DatabaseManager:
         num = Score.select().count()
         while num > threshold:
             worst = self.get_worst_score()
+            print(worst)
             worst.delete_instance()
             num -= 1
         
@@ -46,4 +47,4 @@ class DatabaseManager:
         return Score.select().order_by(Score.score.desc())
         
     def get_worst_score(self):
-        return Score.select().order_by(Score.score.asc()).limit(1)
+        return Score.select().order_by(Score.score.asc()).limit(1).get()

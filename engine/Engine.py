@@ -3,6 +3,7 @@ from engine.Scene import Scene
 from engine.ResourceManager import ResourceManager
 from engine.components.TextureComponent import TextureComponent
 from engine.components.CollisionComponent import CollisionComponent
+from engine.components.SoundComponent import SoundComponent
 from engine.enums import CollisionResponse, Mobility
 
 class Engine:
@@ -31,6 +32,9 @@ class Engine:
         self._scene_changing = False
         self._frame_time = (1 / self._fps)
         self._running = False
+        self._paused = False
+        self._wait_time = 0
+        self._delayed_functions = []
 
  
     def load(self):
@@ -40,6 +44,7 @@ class Engine:
         ResourceManager.get().load_resources()
         ResourceManager.get().register_component("TextureComponent", TextureComponent())
         ResourceManager.get().register_component("CollisionComponent", CollisionComponent())
+        ResourceManager.get().register_component("SoundComponent", SoundComponent())
         self._running = True
         
     def register_for_collision(self, collider : CollisionComponent):
@@ -49,13 +54,11 @@ class Engine:
             self._static_future_colliders.append(collider)
 
     def unregister_for_collision(self, collider : CollisionComponent):
-        try:
-            if collider.get_mobility() == Mobility.DYNAMIC:
-                self._dynamic_future_colliders.remove(collider)
-            else:
-                self._static_future_colliders.remove(collider)
-        except ValueError:
-            print("A FUCKUP")
+        if collider.get_mobility() == Mobility.DYNAMIC:
+            self._dynamic_future_colliders.remove(collider)
+        else:
+            self._static_future_colliders.remove(collider)
+        
 
     def get_events(self) -> list[pygame.event.Event]:
         return self._events
@@ -74,10 +77,39 @@ class Engine:
     def get_active_scene(self) -> Scene:
         return self._active_scene
     
+    def play_music(self, track_name, volume_percent):
+        if pygame.mixer.music.get_busy():
+            pygame.mixer.music.stop()
+            pygame.mixer.music.unload()
+        pygame.mixer.music.load(ResourceManager.get().get_music(track_name))
+        pygame.mixer.music.set_volume(volume_percent / 100)
+        pygame.mixer.music.play(-1)
+
+    def resume(self):
+        self._paused = False
+
+    def pause(self):
+        self._paused = True
+
+    def wait(self, time):
+        self._paused = True
+        self.set_function_delay(self.resume, time)
+
+    def set_function_delay(self, func, time):
+        self._delayed_functions.append([func, time])
+
     def main_loop(self):        
         while self._running:
             self._clock.tick(self._fps)
+            for func in self._delayed_functions:
+                if func[1] > 0:
+                    func[1] -= self._frame_time
+                else:
+                    func[0]()
+                    self._delayed_functions.remove(func)
             self._events.clear()
+            if self._paused:
+                continue
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self._running = False
@@ -87,7 +119,6 @@ class Engine:
                 self._active_scene.update(self._frame_time)
                 self.check_collisions()
                 self.draw()
-
 
     def check_collisions(self):
         self._static_colliders = self._static_future_colliders.copy()
@@ -104,7 +135,6 @@ class Engine:
             for i in range(len(self._static_colliders)):
                 self._static_colliders[i].update_collisions()
 
-
     def collide_two(self, collider : CollisionComponent, other : CollisionComponent):
         if other.get_response() == CollisionResponse.IGNORE:
             return
@@ -120,8 +150,6 @@ class Engine:
                 intersects = self.check_intersects(collider.get_collision_bounds(), other.get_collision_bounds())
             if intersects:
                 other.on_collision(collider)
-
-
 
     def quit_game(self):
         self._running = False

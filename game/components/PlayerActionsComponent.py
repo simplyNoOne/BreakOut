@@ -59,8 +59,8 @@ class PlayerActionsComponent(EntityComponent):
         self._owner.x += self._vel * dt
         if self._owner.x < 0:
             self._owner.x = 0
-        if self._owner.x > self._window_width - self._owner.get_component("TextureComponent").get_size()[0]:
-            self._owner.x = self._window_width - self._owner.get_component("TextureComponent").get_size()[0]
+        if self._owner.x > self._window_width - self._owner.get_component("CollisionComponent").get_width():
+            self._owner.x = self._window_width - self._owner.get_component("CollisionComponent").get_width()
 
 
         

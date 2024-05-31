@@ -10,30 +10,31 @@ class BallBehaviorComponent(EntityComponent):
         self._starting = True
         self._acc = 330
         self._width = 0
+        self._refraction_strength = 0.7
         self._already_hit = False
+        self._slowdown = 0.2
+        self._num_slowdowns = 0
 
     def set_width(self, width):
         self._width = width
 
     def load(self):
         super().load()
-        vel = GameManager.get().get_ball_vel()
+        self._max_vel_mult = GameManager.get().get_ball_vel()
+        self._vel_mult = GameManager.get().get_ball_vel() // 100
         self._vel = [1, -1]
-        self._max_vel = [vel, vel]
         self._window = Engine.get().get_window_size()
         self._starting = True
 
 
     def update(self, dt):
         super().update(dt)
-        self._already_hit = False
         if self._starting:
-            if abs(self._vel[1]) < self._max_vel[1]:
-                self._vel[1] += self._acc * dt * (self._vel[1] / abs(self._vel[1]))
-                self._vel[0] += self._acc * dt * (self._vel[0] / abs(self._vel[0]))
+            if self._vel_mult < self._max_vel_mult:
+                self._vel_mult += self._acc * dt
+                self.diagonal_correction()
             else:
-                self._vel[1] = self._max_vel[1] * (self._vel[1] / abs(self._vel[1]))
-                self._vel[0] = self._max_vel[0] * (self._vel[0] / abs(self._vel[0]))
+                self._vel_mult = self._max_vel_mult
                 self._starting = False
 
         self._owner.x += self._vel[0] * dt
@@ -44,40 +45,53 @@ class BallBehaviorComponent(EntityComponent):
         if self._owner.y < 0: 
             self._vel[1] = -self._vel[1]
         elif self._owner.y > self._window[1]:
+            Engine.get().get_active_scene().remove_entity(self._owner)
             GameManager.get().on_lost()
   
     def on_overlap(self, component: CollisionComponent, other : CollisionComponent):
-        if self._already_hit:
-            return
-        self._already_hit = True
         if other._owner.get_name() == "platform":
-            self.calc_new_dir(component, other)
+            self.bounce_from_platform(component, other)
         if other._owner.get_name() == "brick":
-            self.change_dir(component, other)
+            self.bounce_from_brick(component, other)
 
-    def calc_new_dir(self, component : CollisionComponent, other : CollisionComponent):
-        platform_hit_spot = component._owner.x + component.get_width() // 2 - other._owner.x
-        if platform_hit_spot < other.get_width() // 3:
-            self._vel[0] = self._vel[0] - self._vel[0] // 10
-        elif platform_hit_spot > other.get_width() * 2 // 3:
-            self._vel[0] = self._vel[0] + self._vel[0] // 10
-        
-        
+    def bounce_from_platform(self, component : CollisionComponent, other : CollisionComponent):
+        middle = other._owner.x + other.get_width() // 2
+        half_width = other.get_width() // 2
+        mid_dist = component._owner.x + component.get_width() // 2 - middle
+        refraction_factor = mid_dist / half_width
+        vel_change = refraction_factor * self._refraction_strength * self._vel_mult
+        self._vel[0] += vel_change
         self._vel[1] = -self._vel[1]
-            
-            
+        self.diagonal_correction()
 
-    def change_dir(self, component : CollisionComponent, other : CollisionComponent):
-        change_y = True
-        if abs(component._owner.x + component.get_width() - other._owner.x) < 1:
-            change_y = False
-        elif abs(other._owner.x + other.get_width() - component._owner.x) < 1:
-            change_y = False
-        if change_y:
-            self._vel[1] = -self._vel[1]
-        else:
-            self._vel[0] = -self._vel[0]
+    def diagonal_correction(self):
+        vel_diagonal = (self._vel[0] ** 2 + self._vel[1] ** 2) ** 0.5
+        x_mult = self._vel[0] / vel_diagonal
+        y_mult = self._vel[1] / vel_diagonal
+        self._vel[0] = x_mult * self._vel_mult
+        self._vel[1] = y_mult * self._vel_mult
+
+    def bounce_from_brick(self, component : CollisionComponent, other : CollisionComponent):
+        if other._owner.get_component("BrickBehaviorComponent").does_change_ball_speed():
+            self.slow_down()
+        if abs(component.get_absolute_x() + component.get_width() - other.get_absolute_x()) < 4:
+            self._vel[0] = -abs(self._vel[0])
+        elif abs(other.get_absolute_x() + other.get_width() - component.get_absolute_x()) < 4:
+            self._vel[0] = abs(self._vel[0])
+        if abs(component.get_absolute_y() + component.get_height() - other.get_absolute_y()) < 4:
+            self._vel[1] = -abs(self._vel[1])
+        elif abs(other.get_absolute_y() + other.get_height() - component.get_absolute_y()) < 4:
+            self._vel[1] = abs(self._vel[1])
         
+    def slow_down(self):
+        self._num_slowdowns += 1
+        self._vel_mult *= (1 - self._slowdown)
+        self.diagonal_correction()
+        Engine.get().set_function_delay(self.reset, 3)
 
 
-
+    def reset(self):
+        self._num_slowdowns -= 1
+        if self._num_slowdowns == 0:
+            self._vel_mult = self._max_vel_mult
+            self.diagonal_correction()

@@ -12,15 +12,14 @@ class GameManager:
             GameManager._instance = GameManager()
         return GameManager._instance
 
-
     def __init__(self):
         self._db : DatabaseManager= DatabaseManager()
         self._round : int= 0
         self._score : int = 0
         self._player : Player = None
         self._start_platform_vel = 900
-        self._start_ball_vel = 200
-        self._ball_vel_incr = 50
+        self._start_ball_vel = 450
+        self._ball_vel_incr = 25
         self._platform_vel_incr = 50
         self._start_cols = 7
         self._start_rows = 4
@@ -28,6 +27,7 @@ class GameManager:
         self._bricks_left = self._bricks
         self._scene : str = "menu"
         self._loaded = False
+        self._music_loudness = 10
 
     def log_player(self, player_name, password):
         if player_name == "":
@@ -47,31 +47,47 @@ class GameManager:
         self._bricks = self.get_cols() * self.get_rows()
         self._bricks_left = self._bricks            
 
-
     def load(self):
         if self._loaded:
             return
         self._loaded = True
         self._db.load("database")
         Engine.get().set_active_scene(self._scene)
+        Engine.get().play_music("menu", self._music_loudness)
 
     def start_game(self):
         self._round = 1
-        self.refresh_bricks()
-        self._scene = "game_level"
-        Engine.get().set_active_scene(self._scene)
+        self.enter_game_level()
 
     def reset_game(self):
         self._score = 0
         self._round = 0
-        self.refresh_bricks()
         self._player = None
+    
+    def on_won(self):
+        self._round += 1
+        Engine.get().pause()
+        Engine.get().set_function_delay(self.enter_game_level, 1.5)
 
     def on_lost(self):
         self.update_db()
-        self._scene = "menu"
-        self.reset_game()
+        Engine.get().set_function_delay(self.exit_game_level, 2)
+        Engine.get().pause()
+
+    def enter_game_level(self):
+        Engine.get().wait(1.5)
+        self.refresh_bricks()
+        self._scene = "game_level"
         Engine.get().set_active_scene(self._scene)
+        Engine.get().play_music("game_level", self._music_loudness)
+
+
+    def exit_game_level(self):
+        self.reset_game()
+        self._scene = "menu"
+        Engine.get().resume()
+        Engine.get().set_active_scene(self._scene)
+        Engine.get().play_music("menu", self._music_loudness)
 
     def to_leaderboard(self):
         self._scene = "leaderboard"
@@ -105,19 +121,26 @@ class GameManager:
 
     def get_score(self):
         return self._score
+    
+    def get_speedy_chance(self):
+        return (self._round // 2) * 0.15
+    
+    def get_bonus_chance(self):
+        return (self._round // 1) * 0.05
 
-    def on_won(self):
-        self._round += 1
-        self.refresh_bricks()
-        self._scene = "game_level"
-        Engine.get().set_active_scene(self._scene)
-
+    def get_harder_chance(self):
+        return (self._round // 2) * 0.1
 
     def brick_broken(self, points : int):
         self._score += points
         self._bricks_left -= 1
         if self._bricks_left == 0:
             self.on_won()
+
+    def get_player_name(self):
+        if self._player:
+            return self._player.name
+        return "Anonymous"
 
     def get_leaderboard(self):
         return self._db.get_scores()

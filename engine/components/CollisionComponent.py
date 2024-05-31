@@ -87,6 +87,12 @@ class CollisionComponent(EntityComponent):
     
     def get_height(self) -> int:
         return self._height
+    
+    def get_absolute_x(self) -> int:
+        return self._x + self._owner.x
+    
+    def get_absolute_y(self) -> int:
+        return self._y + self._owner.y
 
     def update_collisions(self) -> None:
         for overlap in self._active_overlaps:

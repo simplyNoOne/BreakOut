@@ -10,7 +10,7 @@ class LeaderboardComponent(EntityComponent):
         self._leaderboard = []
         self._back_button : MenuButton = None
         self._on_back = []
-        self._font_size = 45
+        self._font_size = 40
         self._color = (220, 220, 220)
 
     def load(self):
@@ -20,16 +20,16 @@ class LeaderboardComponent(EntityComponent):
         txt_comp.switch_texture("green")
         txt_comp.add_text("Back", self._font_size, self._color)
         self._back_button.x = self._owner.x - txt_comp.get_size()[0] // 2
-        self._back_button.y = (5 * self._owner.y ) // 3
+        self._back_button.y = Engine.get().get_window_size()[1] - self._owner.y
         Engine.get().get_active_scene().add_existing_entity(self._back_button)
-        self._font = pygame.font.Font(None, 50)
+        self._font = pygame.font.Font(None, self._font_size)
         self.populate_leaderboard()
 
 
     def populate_leaderboard(self):
         entries = GameManager.get().get_leaderboard()
         for i, entry in enumerate(entries):
-            text = f"{i + 1}. {entry.player.name} - {entry.score}"
+            text = f"{str(i + 1).zfill(2)}.    {entry.player.name}:           {entry.score}"
             self._leaderboard.append(text)
 
 
@@ -48,8 +48,8 @@ class LeaderboardComponent(EntityComponent):
     def draw(self, window):
         super().draw(window)
         for i, entry in enumerate(self._leaderboard):
-            text = self._font.render(entry, True, (255, 255, 255))
-            window.blit(text, (self._owner.x - 100, self._owner.y - 300 + i * 45))
+            text = self._font.render(entry, True, self._color)
+            window.blit(text, (self._owner.x - 200, self._owner.y + 50 + i * 40))
 
 
     def bind_to_back_button(self, func):

@@ -1,6 +1,6 @@
-from engine import Scene
+from engine import Engine, Scene
 from game.entities import MenuButton
-
+from pygame import font
 
 class Leaderboard(Scene):
     def __init__(self):

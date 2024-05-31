@@ -18,7 +18,7 @@ class Platform(Entity):
     def load(self):
         super().load()
         self._texture.set_texture("platform", 200, 20)
-        self._collision.set_size(200,20)
+        self._collision.set_size(200, 8)
         self._collision.set_offset(0, 0)
         self._collision.set_collision_type(CollisionMask.MASK1)
         self._collision.set_response(CollisionResponse.OVERLAP)
