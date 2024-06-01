@@ -88,11 +88,10 @@ class BallBehaviorComponent(EntityComponent):
         self._num_slowdowns += 1
         self._vel_mult *= (1 - self._slowdown)
         self.diagonal_correction()
-        Engine.get().set_function_delay(self.reset, 3)
+        Engine.get().set_function_delay(self.reset, 5)
 
 
     def reset(self):
         self._num_slowdowns -= 1
         if self._num_slowdowns == 0:
-            self._vel_mult = self._max_vel_mult
-            self.diagonal_correction()
+            self._starting = True

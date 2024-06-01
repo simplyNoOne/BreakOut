@@ -33,6 +33,8 @@ class LeaderboardComponent(EntityComponent):
         self._buttons.append(self._back_button)
         self._buttons.append(self._delete_button)
         self._active_button = 0
+        self._active_player = GameManager.get().get_player_name()
+        self._player_anonymous = GameManager.get().player_anonymous()
 
         Engine.get().get_active_scene().add_existing_entity(self._back_button)
         Engine.get().get_active_scene().add_existing_entity(self._delete_button)
@@ -46,7 +48,7 @@ class LeaderboardComponent(EntityComponent):
         entries = GameManager.get().get_leaderboard()
         for i, entry in enumerate(entries):
             print(entry.player.name)
-            if entry.player.name == GameManager.get().get_player_name():
+            if entry.player.name == self._active_player:
                 text = (f"{str(i + 1).zfill(2)}.    {entry.player.name} (You)", f"{13*" "}{entry.score}")
             else:
                 text = (f"{str(i + 1).zfill(2)}.    {entry.player.name}", f"{13*" "}{entry.score}")
@@ -68,7 +70,8 @@ class LeaderboardComponent(EntityComponent):
                         for func in self._on_delete:
                             func()
 
-
+                if self._player_anonymous:
+                    return
                 if event.key == pygame.K_LEFT:
                     self._active_button = self._active_button - 1 if self._active_button > 0 else 0
                 if event.key == pygame.K_RIGHT:
@@ -81,8 +84,10 @@ class LeaderboardComponent(EntityComponent):
     def refresh_buttons(self):
         for button in self._buttons:
             button.get_component("TextureComponent").switch_texture("red")
-        
         self._buttons[self._active_button].get_component("TextureComponent").switch_texture("green")
+        if self._player_anonymous:
+            self._buttons[1].get_component("TextureComponent").switch_texture("gray")
+        
 
 
     def draw(self, window):

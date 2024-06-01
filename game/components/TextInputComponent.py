@@ -1,5 +1,5 @@
 import pygame
-from engine import Engine, EntityComponent, ResourceManager
+from engine import Engine, EntityComponent
 from game.GameManager import GameManager
 
 
@@ -40,10 +40,12 @@ class TextInputComponent(EntityComponent):
         self._label_x = self._owner.x - 300
         self._label_name_surface = self._font.render("Name: ", True, self._label_color)
         self._label_pass_surface = self._font.render("Password: ", True, self._label_color)
+        self._incorrect_pass_surface = self._font.render("Incorrect!", True, self._label_color)
         w = self._label_pass_surface.get_width()
         self._box_x = self._label_x + w + 20
         self._box_y1 = self._owner.y - self._up_shift
         self._box_y2 = self._owner.y - self._up_shift + self._box_h + 20
+        self._pass_incorrect = False
 
 
     def update(self, dt):
@@ -73,7 +75,7 @@ class TextInputComponent(EntityComponent):
         for func in self._on_credentials_collected:
             func(self._player_name[0], self._pass[0])
         if GameManager.get().get_player_name() == "":
-            self._pass[0] = ""
+            self._pass_incorrect = True
         
 
     def draw(self, window):
@@ -86,6 +88,8 @@ class TextInputComponent(EntityComponent):
         window.blit(pass_surface, (self._box_x + self._shift, self._box_y2 + self._shift))
         pygame.draw.rect(window, self._col_1, (self._box_x, self._box_y1, self._box_w, self._box_h), 2)
         pygame.draw.rect(window, self._col_2, (self._box_x, self._box_y2, self._box_w, self._box_h), 2)
+        if self._pass_incorrect:
+            window.blit(self._incorrect_pass_surface, (self._box_x + self._box_w + 20, self._box_y2 + self._shift))
 
 
     def focus_down(self):

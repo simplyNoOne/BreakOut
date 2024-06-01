@@ -173,3 +173,6 @@ class GameManager:
             self._db.delete_player(self._player)
             self.log_player("", "")
             self.to_leaderboard()
+
+    def player_anonymous(self):
+        return self._player.name == "Anonymous"

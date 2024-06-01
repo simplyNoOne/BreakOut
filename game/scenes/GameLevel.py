@@ -9,8 +9,8 @@ class GameLevel(Scene):
         self._level_info = "Level "
 
     def populate_scene(self):
-        self.add_entity("platform")
         self.add_entity("ball")
+        self.add_entity("platform")
         self.add_entity("wall")
         self.add_entity("stats_display")
         

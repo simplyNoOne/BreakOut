@@ -23,6 +23,7 @@ class Platform(Entity):
         self._collision.set_collision_type(CollisionMask.MASK1)
         self._collision.set_response(CollisionResponse.OVERLAP)
         self._collision.set_mobility(Mobility.DYNAMIC)
+        self._logic.set_bounds()
         Engine.get().register_for_collision(self._collision)
         window = Engine.get().get_window_size()
         self.x = (window[0] - self._texture.get_size()[0]) // 2

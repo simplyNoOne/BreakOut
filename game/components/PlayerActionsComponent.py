@@ -13,11 +13,17 @@ class PlayerActionsComponent(EntityComponent):
         self._move_l = False
         self._move_r = False
         self._is_moving = False
+        self._left_bound = 0
+        self._right_bound = 0
 
     def load(self):
         super().load()
         self._max_vel = GameManager.get().get_platform_vel()
         self._window_width = Engine.get().get_window_size()[0]
+
+    def set_bounds(self):
+        self._left_bound = - self._owner.get_component("CollisionComponent").get_width() // 2
+        self._right_bound = self._window_width - self._owner.get_component("CollisionComponent").get_width() // 2
 
     def update(self, dt):
         super().update(dt)
@@ -57,10 +63,12 @@ class PlayerActionsComponent(EntityComponent):
             self._vel = dt * self._acc + self._vel if abs(self._vel + self._acc * dt) <= self._max_vel else self._max_vel * (self._acc / abs(self._acc))
 
         self._owner.x += self._vel * dt
-        if self._owner.x < 0:
-            self._owner.x = 0
-        if self._owner.x > self._window_width - self._owner.get_component("CollisionComponent").get_width():
-            self._owner.x = self._window_width - self._owner.get_component("CollisionComponent").get_width()
+
+
+        if self._owner.x < self._left_bound:
+            self._owner.x = self._left_bound
+        if self._owner.x > self._right_bound:
+            self._owner.x = self._right_bound
 
 
         
