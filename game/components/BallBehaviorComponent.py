@@ -14,6 +14,7 @@ class BallBehaviorComponent(EntityComponent):
         self._already_hit = False
         self._slowdown = 0.2
         self._num_slowdowns = 0
+        self._bounce_margin = 5
 
     def set_width(self, width):
         self._width = width
@@ -74,15 +75,15 @@ class BallBehaviorComponent(EntityComponent):
     def bounce_from_brick(self, component : CollisionComponent, other : CollisionComponent):
         if other._owner.get_component("BrickBehaviorComponent").does_change_ball_speed():
             self.slow_down()
-        if abs(component.get_absolute_x() + component.get_width() - other.get_absolute_x()) < 4:
-            self._vel[0] = -abs(self._vel[0])
-        elif abs(other.get_absolute_x() + other.get_width() - component.get_absolute_x()) < 4:
-            self._vel[0] = abs(self._vel[0])
-        if abs(component.get_absolute_y() + component.get_height() - other.get_absolute_y()) < 4:
-            self._vel[1] = -abs(self._vel[1])
-        elif abs(other.get_absolute_y() + other.get_height() - component.get_absolute_y()) < 4:
-            self._vel[1] = abs(self._vel[1])
-        
+        if abs(component.get_absolute_x() + component.get_width() - other.get_absolute_x()) < self._bounce_margin:
+            self._vel[0] = -abs(self._vel[0])    
+        elif abs(other.get_absolute_x() + other.get_width() - component.get_absolute_x()) < self._bounce_margin:
+                self._vel[0] = abs(self._vel[0])
+        if abs(component.get_absolute_y() + component.get_height() - other.get_absolute_y()) < self._bounce_margin:
+                self._vel[1] = -abs(self._vel[1])
+        elif abs(other.get_absolute_y() + other.get_height() - component.get_absolute_y()) < self._bounce_margin:
+                self._vel[1] = abs(self._vel[1])
+           
     def slow_down(self):
         self._num_slowdowns += 1
         self._vel_mult *= (1 - self._slowdown)

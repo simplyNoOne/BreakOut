@@ -8,6 +8,8 @@ from game import MenuButton, MenuEntity, MenuButtonsComponent, TextInputComponen
 from game import PlayerActionsComponent, WallBuilderComponent, BallBehaviorComponent, BrickBehaviorComponent
 from game import GameManager
 
+Engine.get().configure_window(1300, 700, 150, True, False)
+
 Engine.get().load()
 
 #------------------------------------

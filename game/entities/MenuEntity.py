@@ -19,8 +19,10 @@ class MenuEntity(Entity):
         self.x = window_size[0] // 2
         self.y = window_size[1] // 2
         super().load()
-        self._buttons_actions.bind_to_on_play(self._player_name_actions.try_start_game)
+        self._buttons_actions.bind_to_on_play(self._player_name_actions.forward_credentials)
+        self._buttons_actions.bind_to_on_play(GameManager.get().start_game)
         self._buttons_actions.bind_to_give_up_focus(self._player_name_actions.get_focus)
+        self._buttons_actions.bind_to_on_leaderboard(self._player_name_actions.forward_credentials)
         self._buttons_actions.bind_to_on_leaderboard(GameManager.get().to_leaderboard)
         self._buttons_actions.bind_to_on_quit(Engine.get().quit_game)
 

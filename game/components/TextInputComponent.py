@@ -1,5 +1,6 @@
 import pygame
 from engine import Engine, EntityComponent, ResourceManager
+from game.GameManager import GameManager
 
 
 
@@ -9,7 +10,7 @@ class TextInputComponent(EntityComponent):
         self._player_name : list[str] = [""]
         self._pass : list[str] = [""]
         self._text : list[str] = self._player_name
-        self._box_w = 300
+        self._box_w = 400
         self._box_h = 60
         self._box_x = 0
         self._box_y1 = 0
@@ -26,12 +27,16 @@ class TextInputComponent(EntityComponent):
         self._on_credentials_collected = []
         self._shift = 15
         self._up_shift = 100
-        
+        self._len_limit = 15
 
 
     def load(self):
         super().load()
         self._font = pygame.font.Font(None, 50)
+        self._player_name[0] = GameManager.get().get_player_name()
+        if self._player_name[0] == "Anonymous":
+            self._player_name[0] = ""
+        self._pass[0] = GameManager.get().get_player_password()
         self._label_x = self._owner.x - 300
         self._label_name_surface = self._font.render("Name: ", True, self._label_color)
         self._label_pass_surface = self._font.render("Password: ", True, self._label_color)
@@ -59,14 +64,16 @@ class TextInputComponent(EntityComponent):
                     self.focus_up()
                 elif event.key == pygame.K_DOWN:
                     self.focus_down()
-                elif event.unicode.isalnum() or event.unicode == "":
-                    if len(self._text[0]) < 10:
+                elif event.unicode.isalnum() or event.unicode == '_':
+                    if len(self._text[0]) < self._len_limit:
                         self._text[0] += event.unicode
                 
 
-    def try_start_game(self):
+    def forward_credentials(self):
         for func in self._on_credentials_collected:
             func(self._player_name[0], self._pass[0])
+        if GameManager.get().get_player_name() == "":
+            self._pass[0] = ""
         
 
     def draw(self, window):

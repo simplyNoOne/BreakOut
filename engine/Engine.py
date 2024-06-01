@@ -26,20 +26,34 @@ class Engine:
         self._static_future_colliders : list[CollisionComponent] = []
         self._dynamic_future_colliders : list[CollisionComponent] = []
         self._clock = pygame.time.Clock()
-        self._fps = 180
-        self._width = 1300
-        self._height = 700
-        self._scene_changing = False
+        self._fps = 60
         self._frame_time = (1 / self._fps)
+        self._width = 1000
+        self._height = 1000
+        self._borderless = False
+        self._mouse = True
+        self._scene_changing = False
         self._running = False
         self._paused = False
         self._wait_time = 0
         self._delayed_functions = []
 
+    def configure_window(self, width, height, fps = 60, borderless = False, mouse = True):
+        self._fps = fps
+        self._frame_time = (1 / self._fps)
+        self._width = width
+        self._height = height
+        self._borderless = borderless
+        self._mouse = mouse
+
  
     def load(self):
         pygame.init()
-        self._window = pygame.display.set_mode((self._width, self._height))
+        pygame.mouse.set_visible(self._mouse)
+        if self._borderless:
+            self._window = pygame.display.set_mode((self._width, self._height), pygame.NOFRAME)
+        else:
+            self._window = pygame.display.set_mode((self._width, self._height))
         self._clock = pygame.time.Clock()
         ResourceManager.get().load_resources()
         ResourceManager.get().register_component("TextureComponent", TextureComponent())

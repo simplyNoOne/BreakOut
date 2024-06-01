@@ -35,16 +35,13 @@ class DatabaseManager:
     def get_num_players(self):
         return Player.select().count()
     
-    def remove_excess(self, threshold : int):
-        num = Score.select().count()
-        while num > threshold:
-            worst = self.get_worst_score()
-            print(worst)
-            worst.delete_instance()
-            num -= 1
-        
-    def get_scores(self):
-        return Score.select().order_by(Score.score.desc())
+    def get_scores(self, num : int):
+        return list(Score.select().order_by(Score.score.desc()).limit(num))
         
     def get_worst_score(self):
         return Score.select().order_by(Score.score.asc()).limit(1).get()
+    
+    def delete_player(self, player: Player):
+        Score.delete().where(Score.player == player).execute()
+        player.delete_instance()
+        
