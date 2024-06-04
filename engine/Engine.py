@@ -112,6 +112,9 @@ class Engine:
     def set_function_delay(self, func, time):
         self._delayed_functions.append([func, time])
 
+    def remove_all_timers(self):
+        self._delayed_functions.clear()
+
     def main_loop(self):        
         while self._running:
             self._clock.tick(self._fps)
@@ -119,9 +122,11 @@ class Engine:
                 if func[1] > 0:
                     func[1] -= self._frame_time
                 else:
-                    func[0]()
                     self._delayed_functions.remove(func)
+                    func[0]()
+            
             self._events.clear()
+            
             if self._paused:
                 continue
             for event in pygame.event.get():

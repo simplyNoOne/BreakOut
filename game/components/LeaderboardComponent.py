@@ -1,6 +1,5 @@
 import pygame
 from engine import Engine, EntityComponent, ResourceManager
-from game.database.DatabaseManager import DatabaseManager
 from game.GameManager import GameManager
 from game.entities.MenuButton import MenuButton
 

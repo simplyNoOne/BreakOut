@@ -9,7 +9,6 @@ class Mobility(Enum):
     STATIC = 0
     DYNAMIC = 1
 
-
 class CollisionMask(Enum):
     NONE = 0
     MASK1 = 1

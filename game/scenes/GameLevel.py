@@ -23,6 +23,7 @@ class GameLevel(Scene):
         self._surface = self._font.render(self._level_info, True, (190,190,190))
         self._w = self._surface.get_width()
         
+        
 
     def draw(self, window):
         window.blit(self._surface, ((self._window_w - self._w) // 2, self._window_h//2))

@@ -1,4 +1,4 @@
-from engine import Entity, Engine, ResourceManager
+from engine import Entity, Engine
 from game.components.LeaderboardComponent import LeaderboardComponent
 from game.GameManager import GameManager
 

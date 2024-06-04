@@ -29,6 +29,7 @@ class GameManager:
         self._loaded = False
         self._music_loudness = 10
         self._level_being_switched = False
+        self._play_time = 90
 
     def log_player(self, player_name, password):
         if player_name == "":
@@ -66,11 +67,13 @@ class GameManager:
     def on_won(self):
         self._level_being_switched = True
         self._round += 1
+        Engine.get().remove_all_timers()
         Engine.get().set_function_delay(self.enter_game_level, 1.5)
 
     def on_lost(self):
         if self._level_being_switched:
             return
+        Engine.get().remove_all_timers()
         self._level_being_switched = True
         self.update_db()
         Engine.get().set_function_delay(self.exit_game_level, 2)
@@ -83,6 +86,7 @@ class GameManager:
         Engine.get().set_active_scene(self._scene)
         Engine.get().play_music("game_level", self._music_loudness)
         self._level_being_switched = False
+        Engine.get().set_function_delay(self.on_lost, self._play_time + 1.5)
 
 
     def exit_game_level(self):
@@ -113,6 +117,9 @@ class GameManager:
 
     def get_round(self):
         return self._round
+    
+    def get_play_time(self):
+        return self._play_time
 
     def get_cols(self):
         return self._start_cols + (self._round // 2)

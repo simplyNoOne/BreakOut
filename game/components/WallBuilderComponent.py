@@ -1,8 +1,8 @@
-from engine import EntityComponent, CollisionComponent
+from engine import EntityComponent
 from engine import Engine, ResourceManager, random
 from game.GameManager import GameManager
 from game.enums import BrickType
-import pygame
+
 
 class WallBuilderComponent(EntityComponent):
     def __init__(self):

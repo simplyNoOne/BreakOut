@@ -2,7 +2,6 @@
 import functools
 from engine import Entity, CollisionComponent, TextureComponent, CollisionResponse, CollisionMask, Engine, SoundComponent
 from game.components.BrickBehaviorComponent import BrickBehaviorComponent
-from game.GameManager import GameManager
 from game.enums import BrickType    
 
 

@@ -1,7 +1,6 @@
 
 from typing import Callable
 from pygame import Rect
-import pygame
 from engine.components.EntityComponent import EntityComponent
 from engine.enums import CollisionResponse, CollisionMask, Mobility
 
@@ -106,7 +105,6 @@ class CollisionComponent(EntityComponent):
             for call in self._end_overlap_calls:
                 call(self, overlap)
 
-        # self._cached_overlaps.clear()
         self._cached_overlaps = self._active_overlaps
         self._active_overlaps = []
 

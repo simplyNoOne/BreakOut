@@ -1,4 +1,4 @@
-from engine import EntityComponent, CollisionComponent
+from engine import EntityComponent
 from engine import Engine
 from game.GameManager import GameManager
 import pygame

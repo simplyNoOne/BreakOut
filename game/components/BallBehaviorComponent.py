@@ -85,6 +85,7 @@ class BallBehaviorComponent(EntityComponent):
                 self._vel[1] = abs(self._vel[1])
            
     def slow_down(self):
+        self._starting = False
         self._num_slowdowns += 1
         self._vel_mult *= (1 - self._slowdown)
         self.diagonal_correction()
