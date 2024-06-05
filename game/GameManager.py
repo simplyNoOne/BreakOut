@@ -2,9 +2,9 @@ from .database.DatabaseManager import DatabaseManager
 from .database.Model import Player
 from engine import Engine
 
+
 class GameManager:
     _instance = None
-
 
     @staticmethod
     def get():
@@ -45,7 +45,6 @@ class GameManager:
                 self._player = None 
                 return
             
-
     def refresh_bricks(self):
         self._bricks = self.get_cols() * self.get_rows()
         self._bricks_left = self._bricks            
@@ -78,7 +77,6 @@ class GameManager:
         self.update_db()
         Engine.get().set_function_delay(self.exit_game_level, 2)
         
-
     def enter_game_level(self):
         Engine.get().wait(1.5)
         self.refresh_bricks()
@@ -87,7 +85,6 @@ class GameManager:
         Engine.get().play_music("game_level", self._music_loudness)
         self._level_being_switched = False
         Engine.get().set_function_delay(self.on_lost, self._play_time + 1.5)
-
 
     def exit_game_level(self):
         self._round = 0
@@ -113,7 +110,6 @@ class GameManager:
         if former_best > self._score:
             return
         self._db.set_player_score(self._player, self._score)
-        
 
     def get_round(self):
         return self._round
@@ -162,16 +158,11 @@ class GameManager:
         return ""
 
     def get_leaderboard(self):
-
         res = self._db.get_scores(10)
-        print(res)
-        for r in res :
-            print(r)
         return res
     
     def get_players_best(self):
         return self._db.get_player_score(self._player)
-
 
     def delete_active_player(self):
         if self._player:

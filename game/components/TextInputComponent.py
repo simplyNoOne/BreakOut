@@ -3,7 +3,6 @@ from engine import Engine, EntityComponent
 from game.GameManager import GameManager
 
 
-
 class TextInputComponent(EntityComponent):
     def __init__(self):
         super().__init__()
@@ -29,7 +28,6 @@ class TextInputComponent(EntityComponent):
         self._up_shift = 100
         self._len_limit = 15
 
-
     def load(self):
         super().load()
         self._font = pygame.font.Font(None, 50)
@@ -46,7 +44,6 @@ class TextInputComponent(EntityComponent):
         self._box_y1 = self._owner.y - self._up_shift
         self._box_y2 = self._owner.y - self._up_shift + self._box_h + 20
         self._pass_incorrect = False
-
 
     def update(self, dt):
         super().update(dt)
@@ -91,7 +88,6 @@ class TextInputComponent(EntityComponent):
         if self._pass_incorrect:
             window.blit(self._incorrect_pass_surface, (self._box_x + self._box_w + 20, self._box_y2 + self._shift))
 
-
     def focus_down(self):
         self._col_1 = self._inactive_color
         self._col_2 = self._active_color
@@ -105,8 +101,6 @@ class TextInputComponent(EntityComponent):
         self._col_2 = self._inactive_color
         self._text = self._player_name
         self._focused_el = 0
-        print("hark")
-
 
     def bind_to_give_up_focus(self, func):
         self._on_give_up_focus.append(func)

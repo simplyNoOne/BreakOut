@@ -2,6 +2,7 @@ from engine import EntityComponent, Engine
 from game.GameManager import GameManager
 from pygame import font
 
+
 class StatsDisplayComponent(EntityComponent):
     def __init__(self):
         super().__init__()
@@ -35,7 +36,6 @@ class StatsDisplayComponent(EntityComponent):
         self._time_w = self._time_surface.get_width()
         self._time_x = self._window[0] // 2 +  self._center_shift
         
-
     def update(self, dt):
         self._score_val = str(self._game_manager.get_score())
         self._time += dt

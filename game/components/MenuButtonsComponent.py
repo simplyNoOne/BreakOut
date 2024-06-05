@@ -20,7 +20,6 @@ class MenuButtonsComponent(EntityComponent):
         self._text_color = (220, 220, 220)
         self._font_size = 45
         self._button_shift = 300
-        
 
     def load(self):
         super().load()
@@ -36,7 +35,6 @@ class MenuButtonsComponent(EntityComponent):
         Engine.get().get_active_scene().add_existing_entity(self._leaderboard)
         Engine.get().get_active_scene().add_existing_entity(self._quit)
         
-
     def bind_to_on_play(self, func):
         self._on_play.append(func)
 
@@ -92,7 +90,6 @@ class MenuButtonsComponent(EntityComponent):
                             func()
         
         self.refresh_buttons()
-
 
     def refresh_buttons(self):
         for button in self._buttons:

@@ -3,6 +3,7 @@ from engine import Engine, EntityComponent, ResourceManager
 from game.GameManager import GameManager
 from game.entities.MenuButton import MenuButton
 
+
 class LeaderboardComponent(EntityComponent):
     def __init__(self):
         super().__init__()
@@ -41,18 +42,15 @@ class LeaderboardComponent(EntityComponent):
         self._font = pygame.font.Font(None, self._font_size)
         self.populate_leaderboard()
 
-
     def populate_leaderboard(self):
         GameManager.get().update_db()
         entries = GameManager.get().get_leaderboard()
         for i, entry in enumerate(entries):
-            print(entry.player.name)
             if entry.player.name == self._active_player:
                 text = (f"{str(i + 1).zfill(2)}.    {entry.player.name} (You)", f"{13*" "}{entry.score}")
             else:
                 text = (f"{str(i + 1).zfill(2)}.    {entry.player.name}", f"{13*" "}{entry.score}")
             self._leaderboard.append(text)
-
 
     def update(self, dt):
         super().update(dt)
@@ -76,9 +74,7 @@ class LeaderboardComponent(EntityComponent):
                 if event.key == pygame.K_RIGHT:
                     self._active_button = self._active_button + 1 if self._active_button < len(self._buttons) - 1 else len(self._buttons) - 1
                 
-        
         self.refresh_buttons()
-
 
     def refresh_buttons(self):
         for button in self._buttons:
@@ -87,8 +83,6 @@ class LeaderboardComponent(EntityComponent):
         if self._player_anonymous:
             self._buttons[1].get_component("TextureComponent").switch_texture("gray")
         
-
-
     def draw(self, window):
         super().draw(window)
         lengths = []
@@ -103,7 +97,6 @@ class LeaderboardComponent(EntityComponent):
         for i, entry in enumerate(renders):
             window.blit(entry[0], (self._owner.x - max_length // 2, self._owner.y + 50 + i * 40))
             window.blit(entry[1], (self._owner.x + (max_length - entry[1].get_width()) - max_length // 2, self._owner.y + 50 + i * 40))
-
 
     def bind_to_back_button(self, func):
         self._on_back.append(func)
