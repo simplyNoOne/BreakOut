@@ -1,5 +1,6 @@
 from engine import Scene
 
+
 class Leaderboard(Scene):
     def __init__(self):
         super().__init__()
