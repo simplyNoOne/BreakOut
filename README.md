@@ -1,4 +1,6 @@
-#BreakOut / NoEngine
+#BreakOut
+
+# run on NoEngine # 
 
 This is a simple Breakout-type game running on a simple custom engine - NoEngine - written using pygame. (yes, creating any semblence of a game engine using python is crazy, hence the atrocius performance)
 
@@ -12,14 +14,14 @@ It loads resources at the beginning, allows you to define and populate scenes, t
 Tips for using NoEngine:
  - Logic should be split between components that are added to relevant entities.
  - Scenes, entities and components are all loaded automatically provided that they are added in the designated spots. Entities must be added to the populate_scene function in your Scene, Components must be created in the add_components function in your Entity. 
- - You can define and reuse your own scenes, entities and components, and to do so, you must register then with the ResourceManager in the main game file.
+ - You can define and reuse your own scenes, entities and components, and to do so, you must register them with the ResourceManager in the main game file.
  - Each frame you can query the Engine for the events.
  - You can customize Components' update functions as well as create you own drawing logic.
  - You can adjust the load and unload behaviour of the Scenes, Entities and Components.
 
 Base components provided by the engine:
- - CollisionComponent - each entity that is to collide must have it, the entity must register its component for collision manually with the Engine.
- - TextureComponent - allows for the entity to be drawn on screen, can display both textures and texts.
+ - CollisionComponent - each Entity that is to collide must have it, the Entity must register its Component for collision manually with the Engine.
+ - TextureComponent - allows for the Entity to be drawn on screen, can display both textures and texts.
  - SoundComponent - allows to play sound effects.
 
 
